@@ -1,0 +1,3 @@
+include ':stepprogressview'
+include ':app'
+rootProject.name = "StepProgressView"

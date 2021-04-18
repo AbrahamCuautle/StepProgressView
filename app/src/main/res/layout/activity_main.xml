@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.abrahamcuautle.stepprogressview.StepProgressView
+            android:id="@+id/step_progress_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginVertical="16dp"
+            app:spv_radius="16dp"
+            app:spv_primary_progress_color="@color/design_default_color_primary"
+            app:spv_secondary_progress_color="@android:color/darker_gray"
+            app:spv_tick_color="@android:color/white"
+            app:spv_number_text_color="@android:color/black"
+            app:spv_number_text_size="14dp"
+            app:spv_number_font_family="@font/inter_bold"
+            app:spv_spacing_step_and_title="8dp"
+            app:spv_title_text_color="@android:color/darker_gray"
+            app:spv_title_text_size="14dp"
+            app:spv_title_font_family="@font/inter_bold"
+            app:spv_titles="@array/spv_titiles"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="Clear"
+        app:cornerRadius="20dp"
+        app:layout_constraintTop_toBottomOf="@id/card"/>
+
+    <EditText
+        android:id="@+id/edt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="16dp"
+        android:singleLine="true"
+        android:textColor="@android:color/black"
+        android:hint="Enter step"
+        app:layout_constraintTop_toBottomOf="@id/btn_clear"
+        />
+
+    <Button
+        android:id="@+id/btn_edt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="Get!"
+        app:cornerRadius="20dp"
+        app:layout_constraintTop_toBottomOf="@id/edt"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

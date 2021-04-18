@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StepProgressView">
+        <attr name="spv_radius" format="dimension"/>
+        <attr name="spv_primary_progress_color" format="color"/>
+        <attr name="spv_secondary_progress_color" format="color"/>
+        <attr name="spv_tick_color" format="color"/>
+        <attr name="spv_number_text_color" format="color"/>
+        <attr name="spv_number_font_family" format="reference"/>
+        <attr name="spv_number_text_size" format="dimension"/>
+        <attr name="spv_spacing_step_and_title" format="dimension"/>
+        <attr name="spv_title_text_color" format="color"/>
+        <attr name="spv_title_font_family" format="reference"/>
+        <attr name="spv_title_text_size" format="dimension"/>
+        <attr name="spv_titles" format="reference"/>
+    </declare-styleable>
+</resources>

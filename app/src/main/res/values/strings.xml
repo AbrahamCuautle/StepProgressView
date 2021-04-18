@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">StepProgressView</string>
+    <string-array name="spv_titiles">
+        <item>Create Account</item>
+        <item>Login</item>
+        <item>Payment</item>
+        <item>Confirm</item>
+    </string-array>
+</resources>

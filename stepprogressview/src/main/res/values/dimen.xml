@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spv_default_radius">16dp</dimen>
+    <dimen name="spv_default_number_txt_size">14dp</dimen>
+    <dimen name="spv_default_spacing_step_and_text">4dp</dimen>
+    <dimen name="spv_default_line_width">2dp</dimen>
+</resources>
