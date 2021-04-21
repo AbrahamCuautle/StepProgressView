@@ -77,7 +77,7 @@ public class StepProgressView extends View {
     private OnStepChangedListener onStepChangedListener;
 
     public interface OnStepChangedListener {
-        void onStepChanged(int position);
+        void onStepChanged(StepProgressView stepProgressView, int position);
     }
 
     private static void log(String message) {
@@ -456,11 +456,6 @@ public class StepProgressView extends View {
         requestLayout();
     }
 
-    public void setTitlesArray(String[] titles) {
-        mTitles = titles;
-        requestLayout();
-    }
-
     public void setRadius(int radius) {
         mRadiusStep = radius;
         mPrimaryProgressPaint.setStrokeWidth(radius * 2);
@@ -563,7 +558,7 @@ public class StepProgressView extends View {
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     if (onStepChangedListener != null){
-                        onStepChangedListener.onStepChanged(position);
+                        onStepChangedListener.onStepChanged(StepProgressView.this, position);
                     }
                 }
             });
@@ -590,7 +585,7 @@ public class StepProgressView extends View {
                 public void onAnimationEnd(Animator animation) {
                     super.onAnimationEnd(animation);
                     if (onStepChangedListener != null){
-                        onStepChangedListener.onStepChanged(position);
+                        onStepChangedListener.onStepChanged(StepProgressView.this, position);
                     }
                 }
             });
