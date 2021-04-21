@@ -1,5 +1,7 @@
 package com.abrahamcuautle.stepprogressview;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -24,16 +26,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 public class StepProgressView extends View {
 
     private final static String TAG_LOGGER = StepProgressView.class.getSimpleName();
 
     private final static int NO_POSITION = -1;
+
+    public static final long PROGRESS_ANIMATION_DURATION = 400L;
 
     private final Paint mStepsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -75,6 +74,12 @@ public class StepProgressView extends View {
 
     private String[] mTitles;
 
+    private OnStepChangedListener onStepChangedListener;
+
+    public interface OnStepChangedListener {
+        void onStepChanged(int position);
+    }
+
     private static void log(String message) {
         Log.d(TAG_LOGGER, message);
     }
@@ -111,7 +116,7 @@ public class StepProgressView extends View {
         int tickTintColor = ta.getColor(R.styleable.StepProgressView_spv_tick_color, Color.WHITE);
 
         int numberTextColor = ta.getColor(R.styleable.StepProgressView_spv_number_text_color, Color.DKGRAY);
-        int numberTextSize= ta.getDimensionPixelOffset(R.styleable.StepProgressView_spv_number_text_size,
+        int numberTextSize = ta.getDimensionPixelOffset(R.styleable.StepProgressView_spv_number_text_size,
                 getContext().getResources().getDimensionPixelOffset(R.dimen.spv_default_number_txt_size));
         int numberTextFontFamily = ta.getResourceId(R.styleable.StepProgressView_spv_number_font_family, R.font.inter_bold);
 
@@ -126,6 +131,9 @@ public class StepProgressView extends View {
         int arrayTitleResId = ta.getResourceId(R.styleable.StepProgressView_spv_titles, 0);
         if (arrayTitleResId != 0) {
             mTitles = getContext().getResources().getStringArray(arrayTitleResId);
+            if (mTitles.length <= 1){
+                throw new IllegalStateException("Number of steps must be al lest 2");
+            }
             mStepCount = mTitles.length;
         }
 
@@ -188,9 +196,15 @@ public class StepProgressView extends View {
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        initStepPoints();
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        initStepPoints();
+
     }
 
     @Override
@@ -256,7 +270,7 @@ public class StepProgressView extends View {
 
     private void initStepPoints() {
 
-        //This padding works for right and left side because every title has the same width
+        //This padding works for both right and left sides because every title has the same width
         int paddingTitle = 0;
         if (mStaticLayoutTitles != null){
             StaticLayout sl = mStaticLayoutTitles[0];
@@ -266,7 +280,7 @@ public class StepProgressView extends View {
         int leftPadding = getPreferredLeftPadding() + paddingTitle;
         int rightPadding = getPreferredRightPadding() + paddingTitle;
         int neededWidth = getWidth() - (int) (mRadiusStep * 2) - leftPadding - rightPadding;
-        int distanceBetweenSteps = neededWidth / (mStepCount - 1);
+        int distanceBetweenSteps = mStepCount <= 1 ? neededWidth : neededWidth / (mStepCount - 1);
         int initialCx = leftPadding + (int) mRadiusStep;
 
         mSteps = new Step[mStepCount];
@@ -391,6 +405,69 @@ public class StepProgressView extends View {
 
     }
 
+    public void setPrimaryProgressColor(int color) {
+        mPrimaryProgressPaint.setColor(color);
+        invalidate();
+    }
+
+    public void setSecondaryProgressColor(int color) {
+        mStepsPaint.setColor(color);
+        mLinesPaint.setColor(color);
+        invalidate();
+    }
+
+    public void setTickTintColor(int color) {
+        mTick.setTint(color);
+        invalidate();
+    }
+
+    public void setNumberTextColor(int color) {
+        mNumbersPaint.setColor(color);
+        invalidate();
+    }
+
+    public void setNumberTypeface(Typeface typeface) {
+        mNumbersPaint.setTypeface(typeface);
+        requestLayout();
+    }
+
+    public void setNumberTextSize(int textSize) {
+        mNumbersPaint.setTextSize(textSize);
+        requestLayout();
+    }
+
+    public void setTitlesTextColor(int color) {
+        mTitlePaint.setColor(color);
+        invalidate();
+    }
+
+    public void setTitlesTypeface(Typeface typeface) {
+        mTitlePaint.setTypeface(typeface);
+        requestLayout();
+    }
+
+    public void setTitlesTextSize(int textSize) {
+        mTitlePaint.setTextSize(textSize);
+        requestLayout();
+    }
+
+    public void setSpacingStepAndTitle(int spacing) {
+        mSpacingStepAndTitle = spacing;
+        requestLayout();
+    }
+
+    public void setTitlesArray(String[] titles) {
+        mTitles = titles;
+        requestLayout();
+    }
+
+    public void setRadius(int radius) {
+        mRadiusStep = radius;
+        mPrimaryProgressPaint.setStrokeWidth(radius * 2);
+        requestLayout();
+    }
+
+
     public void setStepPosition(int position) {
         if (position < 0 || position >= mStepCount){
             return;
@@ -403,6 +480,8 @@ public class StepProgressView extends View {
         checkAndUncheckSteps(position);
 
         if (ViewCompat.isLaidOut(this) && !isLayoutRequested()) {
+            mProgressAnimation.cancel();
+            mProgressTextAnimation.cancel();
             mProgressAnimation.start(position);
             mProgressTextAnimation.start(position);
         }
@@ -418,6 +497,10 @@ public class StepProgressView extends View {
             mProgressTextAnimation.clear();
         }
         mStepPosition = NO_POSITION;
+    }
+
+    public void setOnStepChangedListener(OnStepChangedListener listener) {
+        this.onStepChangedListener = listener;
     }
 
     private void checkAndUncheckSteps(int position) {
@@ -466,14 +549,23 @@ public class StepProgressView extends View {
                 return;
             }
             Step nextSp = mSteps[position];
-            int delta = Math.abs(mStepPosition - position);
+            int delta = computeDelta(position);
 
             animator = ValueAnimator.ofFloat(mLineX, nextSp.getCx() + mRadiusStep);
-            animator.setDuration(500L + (delta * 50));
+            animator.setDuration(PROGRESS_ANIMATION_DURATION + (delta * 50));
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.addUpdateListener(animation -> {
                 mLineX = (float) animation.getAnimatedValue();
                 invalidate();
+            });
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    if (onStepChangedListener != null){
+                        onStepChangedListener.onStepChanged(position);
+                    }
+                }
             });
             animator.start();
 
@@ -484,14 +576,23 @@ public class StepProgressView extends View {
                 return;
             }
             Step nextSp = mSteps[position];
-            int delta = Math.abs(mStepPosition - position);
+            int delta = computeDelta(position);
 
             animator = ValueAnimator.ofFloat(mLineX, nextSp.getCx() + mRadiusStep);
-            animator.setDuration(500L + (delta * 50));
+            animator.setDuration(PROGRESS_ANIMATION_DURATION + (delta * 50));
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.addUpdateListener(animation -> {
                 mLineX = (float) animation.getAnimatedValue();
                 invalidate();
+            });
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    if (onStepChangedListener != null){
+                        onStepChangedListener.onStepChanged(position);
+                    }
+                }
             });
             animator.start();
         }
@@ -506,16 +607,21 @@ public class StepProgressView extends View {
             }
 
             Step nextSp = mSteps[0];
-            int delta = mStepPosition;
+            int delta = computeDelta(0);
 
             animator = ValueAnimator.ofFloat(mLineX, nextSp.getCx() - mRadiusStep);
-            animator.setDuration(500L + (delta * 50));
+            animator.setDuration(PROGRESS_ANIMATION_DURATION + (delta * 50));
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.addUpdateListener(animation -> {
                 mLineX = (float) animation.getAnimatedValue();
                 invalidate();
             });
             animator.start();
+        }
+
+        private int computeDelta(int position) {
+            int stepPosition = mStepPosition == NO_POSITION ? 0 :  mStepPosition;
+            return Math.abs(stepPosition -  position);
         }
 
     }
@@ -543,12 +649,11 @@ public class StepProgressView extends View {
                 return;
             }
             Step nextSp = mSteps[position];
-            int delta = Math.abs(mStepPosition - position);
-
             StaticLayout sl = mStaticLayoutTitles[position];
+            int delta = computeDelta(position);
 
             animator = ValueAnimator.ofFloat(mProgressX, nextSp.getCx() + (float) (sl.getWidth() / 2));
-            animator.setDuration(500L + (delta * 50));
+            animator.setDuration(PROGRESS_ANIMATION_DURATION + (delta * 50));
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.addUpdateListener(animation -> {
                 mProgressX = (float) animation.getAnimatedValue();
@@ -563,12 +668,11 @@ public class StepProgressView extends View {
                 return;
             }
             Step nextSp = mSteps[position];
-            int delta = Math.abs(mStepPosition - position);
-
             StaticLayout sl = mStaticLayoutTitles[position];
+            int delta = computeDelta(position);
 
             animator = ValueAnimator.ofFloat(mProgressX, nextSp.getCx() + (float) (sl.getWidth() / 2));
-            animator.setDuration(500L + (delta * 50));
+            animator.setDuration(PROGRESS_ANIMATION_DURATION + (delta * 50));
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.addUpdateListener(animation -> {
                 mProgressX = (float) animation.getAnimatedValue();
@@ -587,18 +691,22 @@ public class StepProgressView extends View {
             }
 
             Step nextSp = mSteps[0];
-            int delta = mStepPosition;
-
             StaticLayout sl = mStaticLayoutTitles[0];
+            int delta = computeDelta(0);
 
             animator = ValueAnimator.ofFloat(mProgressX, nextSp.getCx() - (float) (sl.getWidth() / 2));
-            animator.setDuration(500L + (delta * 50));
+            animator.setDuration(PROGRESS_ANIMATION_DURATION + (delta * 50));
             animator.setInterpolator(new AccelerateDecelerateInterpolator());
             animator.addUpdateListener(animation -> {
                 mProgressX = (float) animation.getAnimatedValue();
                 invalidate();
             });
             animator.start();
+        }
+
+        private int computeDelta(int position) {
+            int stepPosition = mStepPosition == NO_POSITION ? 0 :  mStepPosition;
+            return Math.abs(stepPosition -  position);
         }
 
     }

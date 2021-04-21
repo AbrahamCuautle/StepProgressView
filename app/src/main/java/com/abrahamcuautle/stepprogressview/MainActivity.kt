@@ -1,7 +1,9 @@
 package com.abrahamcuautle.stepprogressview
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -12,6 +14,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        findViewById<StepProgressView>(R.id.step_progress_view).setOnStepChangedListener {
+            Log.d("TAG_APP", "Position: $it")
+        }
 
         findViewById<Button>(R.id.btn_clear).setOnClickListener {
             findViewById<StepProgressView>(R.id.step_progress_view).clear()
