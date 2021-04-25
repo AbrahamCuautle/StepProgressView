@@ -6,6 +6,24 @@ A library to show a tracking status of a process
 
 ![Screenshot](https://github.com/AbrahamCuautle/StepProgressView/blob/main/screenshots/demo-step-progress-view.gif)
 
+## Installation
+
+Add this in your root `build.gradle` file:
+```gradle
+allprojects {
+    repositories {
+        maven { url "https://www.jitpack.io" }
+    }
+}
+```
+
+Then, add the library to your module `build.gradle`:
+```gradle
+dependencies {
+    implementation 'com.github.AbrahamCuautle:StepProgressView:{latest_version}'
+}
+```
+
 ## Usage
 ```xml
 
