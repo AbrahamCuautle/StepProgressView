@@ -15,8 +15,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<StepProgressView>(R.id.step_progress_view).setOnStepChangedListener {
-            Log.d("TAG_APP", "Position: $it")
+        findViewById<StepProgressView>(R.id.step_progress_view).setOnStepChangedListener { view, position ->
+            Log.d("TAG_APP", "Position: $position")
         }
 
         findViewById<Button>(R.id.btn_clear).setOnClickListener {

@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.BlendMode;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,6 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
+
+import com.google.android.material.color.MaterialColors;
 
 public class StepProgressView extends View {
 
@@ -107,8 +111,9 @@ public class StepProgressView extends View {
         mRadiusStep = ta.getDimension(R.styleable.StepProgressView_spv_radius,
                 getContext().getResources().getDimension(R.dimen.spv_default_radius));
 
+        int defaultColor = ContextCompat.getColor(getContext(), R.color.spv_default_selected_color);
         int primaryColor = ta.getColor(R.styleable.StepProgressView_spv_primary_progress_color,
-                ContextCompat.getColor(getContext(), R.color.design_default_color_primary));
+                MaterialColors.getColor(getContext(), R.attr.colorPrimaryVariant, defaultColor));
 
         int secondaryColor = ta.getColor(R.styleable.StepProgressView_spv_secondary_progress_color,
                 Color.LTGRAY);
@@ -204,7 +209,6 @@ public class StepProgressView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
     }
 
     @Override
@@ -217,6 +221,24 @@ public class StepProgressView extends View {
         drawTitles(canvas);
         drawProgressTitle(canvas);
     }
+
+    @Override
+    public void setBackground(Drawable background) { }
+
+    @Override
+    public void setBackgroundColor(int color) { }
+
+    @Override
+    public void setBackgroundResource(int resid) { }
+
+    @Override
+    public void setBackgroundTintList(@Nullable ColorStateList tint) { }
+
+    @Override
+    public void setBackgroundTintBlendMode(@Nullable BlendMode blendMode) { }
+
+    @Override
+    public void setBackgroundTintMode(@Nullable PorterDuff.Mode tintMode) { }
 
     private int computeOptimalTitlesHeight(int width) {
         if (mTitles == null){
